@@ -18,18 +18,18 @@ levels = [
         "1111111111111111111",
         "1    E       E    1",
         "1WWWW 1111111 WWWW1",
-        "1         1   1   1",
-        "1P    T   1 W 1  F1",
-        "1           W 1   1",
-        "1111 11111111   111",
+        "1        1   1    1",
+        "1P     D 1 W 1  TF1",
+        "1          W 1    1",
+        "1111 1111111   1111",
         "1   E            E1",
         "1111111111111111111"
     ],
     [
         "1111111111111111111",
         "1 E  P            1",
-        "11111111111111111 1",
-        "1                 1",
+        "111 1111111111 1111",
+        "1                E1",
         "1 11111111111111111",
         "1                 1",
         "1   1    B E  1   1",
@@ -75,7 +75,7 @@ player = Player(level.start_pos[0], level.start_pos[1], "src/sprites/wizard_tile
                 32, 32)
 
 enemies = level.enemies
-enemies_boss = level.enemies_boss
+enemies_boss = level.bosses
 
 while True:
     delta_time = clock.tick(FPS)
@@ -89,9 +89,17 @@ while True:
                 player.shoot()
 
     # Логика игры
-    player.move(level.walls)
+
+    player.move(level.walls, level.waters)
     # player.move(level.waters)
 
+    for trap in level.traps:
+        if(player.rect.colliderect(trap)):
+            player.rect.x, player.rect.y = level.start_pos
+    for bonus in level.bonuses:
+        if(player.rect.colliderect(bonus)):
+            player.lives += 1
+            level.bonuses.remove(bonus)
     for enemy in enemies:
         if player.rect.colliderect(enemy.rect):  # Проверяем столкновение с врагом
             player.lives -= 1  # Уменьшаем количество жизней
@@ -114,7 +122,7 @@ while True:
             player = Player(level.start_pos[0], level.start_pos[1],
                             "src/sprites/wizard_tiles.png", 32, 32)
             enemies = level.enemies
-            enemies_boss = level.enemies_boss
+            enemies_boss = level.bosses
 
     # Обновление врагов
 
@@ -122,8 +130,12 @@ while True:
         enemy.update(player, level.walls, delta_time)
         enemy.draw(screen)
 
+    for boss in level.bosses:
+        boss.update(player, level.walls, delta_time)
+        boss.draw(screen)
+
     # Обновление снарядов
-    player.update(delta_time, level.walls)
+    player.update(delta_time, level.walls, level.waters)
     player.update_bullets(level.walls, enemies)
 
     # Рендеринг

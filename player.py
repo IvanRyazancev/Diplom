@@ -5,7 +5,8 @@ from settings import WIDTH, HEIGHT
 class Player:
     def __init__(self, x, y, sprite_sheet_path, tile_width, tile_height):
         self.rect = pygame.Rect(x, y, 40, 40)  # Уменьшенный размер для лучшего восприятия
-        self.speed = 4  # Скорость движения
+        self.base_speed = 4 # Базовая скорость героя
+        self.speed = self.base_speed  # Скорость движения
         self.bullets = []  # Список снарядов
         self.direction = pygame.Vector2(1, 0)  # Начальное направление (вверх)
         self.facing_right = True  # Направление взгляда (True = вправо)
@@ -48,9 +49,14 @@ class Player:
                     return False
         return True
 
-    def move(self, walls):
+    def move(self, walls, waters):
         if self.is_shooting or self.is_dead:
             return  # Игрок не двигается, если стреляет или умирает
+
+        self.speed = self.base_speed
+
+        if any(self.rect.colliderect(water) for water in waters):
+            self.speed *= 0.2
 
         keys = pygame.key.get_pressed()
         movement = pygame.Vector2(0, 0)
@@ -227,6 +233,6 @@ class Player:
             frame = pygame.transform.flip(frame, True, False)  # Переворачиваем по горизонтали
         screen.blit(frame, self.rect.topleft)
 
-    def update(self, delta_time, walls):
-        self.move(walls)
+    def update(self, delta_time, walls, waters):
+        self.move(walls, waters)
         self.update_animation(delta_time)

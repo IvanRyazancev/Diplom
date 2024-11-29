@@ -1,13 +1,14 @@
 import pygame, random
 from settings import TILE_SIZE
 from enemy import Enemy
+from boss import Boss
 
 class Level:
     def __init__(self, level_data):
         self.walls = []
         self.waters = []
         self.enemies = []
-        self.enemies_boss = []
+        self.bosses = []
         self.water = []  # Добавляем тайлы воды
         self.traps = []  # Добавляем тайлы ловушек
         self.bonuses = []  # Добавляем тайлы бонусов
@@ -16,6 +17,7 @@ class Level:
         self.width = 0
         self.height = 0
         self.parse_level(level_data)
+
     def random_bool(self):
         return random.choice([True, False])
     def parse_level(self, level_data):
@@ -28,12 +30,12 @@ class Level:
                     self.walls.append(position)
                 elif tile == 'E':
                     enemy = Enemy(position.x, position.y, speed=5, sprite_sheet_path="src/sprites/enemy.png",
-                                  tile_width=32, tile_height=32, facing_right = self.random_bool)
+                                  tile_width=32, tile_height=32, facing_right = self.random_bool())
                     self.enemies.append(enemy)
                 elif tile == 'D':
-                    enemy_boss = Enemy(position.x, position.y, speed=4, sprite_sheet_path="src/sprites/boss.png",
-                                       tile_width=32, tile_height=32, facing_right=self.random_bool)
-                    self.enemies_boss.append(enemy_boss)
+                    boss = Boss(position.x, position.y, speed=1, sprite_sheet_path="src/sprites/boss.png",
+                                tile_width=32, tile_height=32, facing_right=self.random_bool())
+                    self.bosses.append(boss)
                 elif tile == 'P':
                     self.start_pos = (position.x, position.y)
                 elif tile == 'F':
